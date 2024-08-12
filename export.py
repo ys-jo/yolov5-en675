@@ -188,19 +188,19 @@ def export_onnx(model, im, file, opset, dynamic, simplify, prefix=colorstr('ONNX
         meta.key, meta.value = k, str(v)
     onnx.save(model_onnx, f)
 
-    # Simplify
-    if simplify:
-        try:
-            cuda = torch.cuda.is_available()
-            check_requirements(('onnxruntime-gpu' if cuda else 'onnxruntime', 'onnx-simplifier>=0.4.1'))
-            import onnxsim
+    # Simplify 
+    #if simplify:
+    try:
+        cuda = torch.cuda.is_available()
+        check_requirements(('onnxruntime-gpu' if cuda else 'onnxruntime', 'onnx-simplifier>=0.4.1'))
+        import onnxsim
 
-            LOGGER.info(f'{prefix} simplifying with onnx-simplifier {onnxsim.__version__}...')
-            model_onnx, check = onnxsim.simplify(model_onnx)
-            assert check, 'assert check failed'
-            onnx.save(model_onnx, f)
-        except Exception as e:
-            LOGGER.info(f'{prefix} simplifier failure: {e}')
+        LOGGER.info(f'{prefix} simplifying with onnx-simplifier {onnxsim.__version__}...')
+        model_onnx, check = onnxsim.simplify(model_onnx)
+        assert check, 'assert check failed'
+        onnx.save(model_onnx, f)
+    except Exception as e:
+        LOGGER.info(f'{prefix} simplifier failure: {e}')
     return f, model_onnx
 
 
@@ -675,6 +675,8 @@ def run(
         iou_thres=0.45,  # TF.js NMS: IoU threshold
         conf_thres=0.25,  # TF.js NMS: confidence threshold
 ):
+    # batch size must be 1 for NPU
+    batch_size = 1
     t = time.time()
     include = [x.lower() for x in include]  # to lowercase
     fmts = tuple(export_formats()['Argument'][1:])  # --include arguments
@@ -801,7 +803,7 @@ def parse_opt(known=False):
     parser.add_argument(
         '--include',
         nargs='+',
-        default=['torchscript'],
+        default=['onnx'],
         help='torchscript, onnx, openvino, engine, coreml, saved_model, pb, tflite, edgetpu, tfjs, paddle')
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     print_args(vars(opt))

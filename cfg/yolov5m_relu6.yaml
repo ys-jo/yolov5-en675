@@ -3,15 +3,12 @@
 # Parameters
 nc: 80  # number of classes
 activation: nn.ReLU6()  # <----- Conv() activation used throughout entire YOLOv5 model
-depth_multiple: 0.33  # model depth multiple
-width_multiple: 0.50  # layer channel multiple
+depth_multiple: 0.67  # model depth multiple
+width_multiple: 0.75  # layer channel multiple
 anchors:
-  - [11,6, 15,18, 36,13]  # P3/8
-  - [33,34, 78,31, 66,74]  # P4/16
-  - [147,64, 167,145, 400,181]  # P5/32
- # - [10,13, 16,30, 33,23]  # P3/8
- # - [30,61, 62,45, 59,119]  # P4/16
- # - [116,90, 156,198, 373,326]  # P5/32
+  - [10,13, 16,30, 33,23]  # P3/8
+  - [30,61, 62,45, 59,119]  # P4/16
+  - [116,90, 156,198, 373,326]  # P5/32
 
 # YOLOv5 v6.0 backbone
 backbone:
@@ -25,7 +22,7 @@ backbone:
    [-1, 9, C3, [512]],
    [-1, 1, Conv, [1024, 3, 2]],  # 7-P5/32
    [-1, 3, C3, [1024]],
-   [-1, 1, RFB, [512, 512]],
+   [-1, 1, RFB, [768, 768]],  # 9
   ]
 
 # YOLOv5 v6.0 head
